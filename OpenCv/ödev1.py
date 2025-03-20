@@ -1,40 +1,25 @@
 import cv2
 
-# Video kaydetmek için VideoCapture nesnesi oluşturuyoruz
 cap = cv2.VideoCapture(0)
 
-# Video kaydediciyi başlatmak için bir codec tanımlıyoruz
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = None
-recording = False
+photo_counter = 1  # Fotoğraf numaralandırma için sayaç oluş
 
 while True:
     ret, frame = cap.read()
-    if not ret:
-        break
+    frame = cv2.flip(frame, 1)
+    cv2.imshow("webcam live", frame)
 
-    # Video penceresini göster
-    cv2.imshow('Video', frame)
-
-    # Kullanıcının tuş basımlarını kontrol et
     key = cv2.waitKey(1) & 0xFF
 
-    if key == ord('s'):  # 's' tuşuna basıldığında kayda başla
-        if not recording:
-            out = cv2.VideoWriter('output.avi', fourcc, 20.0, (640, 480))
-            recording = True
-            print("Kayda başlandı.")
+    if key == ord('s'):  # 's' tuşuna bas foto alır kaydederiz
+        photo_filename = f"C:\\Users\\BT\\Desktop\\Visual Studio code\\OpenCv\\photo_{photo_counter}.jpg"
+        cv2.imwrite(photo_filename, frame)
+        print(f"Fotoğraf kaydedildi: {photo_filename}")
+        photo_counter += 1  # Fotoğraf numarasını artırır birden fazla foto alırsak mesela
 
-    if recording:
-        # Video kaydediliyorsa frame'leri kaydet
-        out.write(frame)
-
-    if key == ord('q'):  # 'q' tuşuna basıldığında kaydı durdur ve çık
-        print("Kaydedilen video sonlandırılıyor.")
+    elif key == ord('q'):  # 'q' tuşuna basıldığında çıkar ekran kapanır
         break
 
-# Kaynakları serbest bırak
+
 cap.release()
-if out:
-    out.release()
 cv2.destroyAllWindows()
